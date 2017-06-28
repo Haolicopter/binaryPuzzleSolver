@@ -45,20 +45,17 @@ class Puzzle:
         # Count down to the show, get ready
         # time.sleep(2)
 
-        matrix = Matrix(self.browser, self.size)
-        self.cells = matrix.readMatrix()
-        matrix.printMatrix(self.cells)
+        self.matrix = Matrix(self.browser, self.size)
+        self.cells = self.matrix.readMatrix()
+        self.matrix.printMatrix(self.cells)
 
-        for i in range(self.size):
-            for j in range(self.size):
-                self.findPairs(i, j)
-
-        # Avoid trios:
-        # If two cells contain the same number with an empty cell in between,
-        # this empty cell should contain the other number.
-
-        # Complete rows and columns:
-        # Each row and each column should contain an equal number of 1s and 0s.
+        tries = 10
+        for t in range(tries):
+            for i in range(self.size):
+                for j in range(self.size):
+                    self.findPairs(i, j)
+                    self.avoidTrios(i, j)
+            self.completeRowsAndCols()
 
         # Eliminate impossible combinations based on completed rows/columns:
         # No identical rows/columns are allowed.
@@ -66,8 +63,12 @@ class Puzzle:
         # Eliminate other impossible combinations.
 
         # Guess and try.
-        matrix.printMatrix(self.cells)
-        matrix.writeMatrix(self.cells)
+        self.matrix.printMatrix(self.cells)
+        if self.matrix.isCompleted():
+            print('Yay! We did it!')
+        else:
+            print('Still need more work')
+        self.matrix.writeMatrix(self.cells)
 
     # Find pairs:
     # Because no more than two similar numbers next to or below each other
@@ -107,14 +108,7 @@ class Puzzle:
                 ]
             }
         ]
-        for neighbour in neighbours:
-            # If neighbour exists and equal to the current cell
-            if self.indexInRange(neighbour['row'], neighbour['col']) and self.cells[neighbour['row']][neighbour['col']] == current:
-                for adjacentCell in neighbour['adjacentCells']:
-                    if self.indexInRange(adjacentCell['row'], adjacentCell['col']):
-                        self.cells[adjacentCell['row']][adjacentCell['col']] = 1 - current
-                        # TODO: how to update adjacent cells pairs without hitting recurrsion limit?
-                        # self.findPairs(adjacentCell['row'], adjacentCell['col'])
+        self.setNeighbours(neighbours, current)
 
     def indexInRange(self, row, col):
         if row < 0 or row > self.size-1:
@@ -122,3 +116,92 @@ class Puzzle:
         if col < 0 or col > self.size-1:
             return False
         return True
+
+    def setNeighbours(self, neighbours, current):
+        for neighbour in neighbours:
+            # If neighbour exists and equal to the current cell
+            if self.indexInRange(neighbour['row'], neighbour['col']) and self.cells[neighbour['row']][neighbour['col']] == current:
+                for adjacentCell in neighbour['adjacentCells']:
+                    if self.indexInRange(adjacentCell['row'], adjacentCell['col']) and self.cells[adjacentCell['row']][adjacentCell['col']] is None:
+                        self.cells[adjacentCell['row']][adjacentCell['col']] = 1 - current
+                        self.matrix.addOne()
+                        # TODO: how to update adjacent cells pairs without hitting recurrsion limit?
+                        # self.findPairs(adjacentCell['row'], adjacentCell['col'])
+
+    # Avoid trios:
+    # If two cells contain the same number with an empty cell in between,
+    # this empty cell should contain the other number.
+    def avoidTrios(self, i, j):
+        current = self.cells[i][j]
+        if current is None:
+            return
+
+        neighbours = [
+            {
+                'row': i-2, 'col': j,
+                'adjacentCells': [
+                    {'row': i-1, 'col': j}
+                ]
+            },
+            {
+                'row': i+2, 'col': j,
+                'adjacentCells': [
+                    {'row': i+1, 'col': j}
+                ]
+            },
+            {
+                'row': i, 'col': j-2,
+                'adjacentCells': [
+                    {'row': i, 'col': j-1}
+                ]
+            },
+            {
+                'row': i, 'col': j+2,
+                'adjacentCells': [
+                    {'row': i, 'col': j+1}
+                ]
+            }
+        ]
+        self.setNeighbours(neighbours, current)
+
+    # Complete rows and columns:
+    # Each row and each column should contain an equal number of 1s and 0s.
+    def completeRowsAndCols(self):
+        # For each row
+        for i in range(self.size):
+            zeroCount = 0
+            oneCount = 0
+            for j in range(self.size):
+                if self.cells[i][j] == 0:
+                    zeroCount += 1
+                elif self.cells[i][j] == 1:
+                    oneCount += 1
+            if zeroCount == self.size/2 and oneCount < self.size/2:
+                for j in range(self.size):
+                    if self.cells[i][j] is None:
+                        self.cells[i][j] = 1
+                        self.matrix.addOne()
+            elif oneCount == self.size/2 and zeroCount < self.size/2:
+                for j in range(self.size):
+                    if self.cells[i][j] is None:
+                        self.cells[i][j] = 0
+                        self.matrix.addOne()
+        # For each col
+        for j in range(self.size):
+            zeroCount = 0
+            oneCount = 0
+            for i in range(self.size):
+                if self.cells[i][j] == 0:
+                    zeroCount += 1
+                elif self.cells[i][j] == 1:
+                    oneCount += 1
+            if zeroCount == self.size/2 and oneCount < self.size/2:
+                for i in range(self.size):
+                    if self.cells[i][j] is None:
+                        self.cells[i][j] = 1
+                        self.matrix.addOne()
+            elif oneCount == self.size/2 and zeroCount < self.size/2:
+                for i in range(self.size):
+                    if self.cells[i][j] is None:
+                        self.cells[i][j] = 0
+                        self.matrix.addOne()

@@ -9,6 +9,7 @@ class Matrix:
         self.browser = browser
         self.size = size
         self.cellCssClass = cellCssClass
+        self.count = 0
 
     def readMatrix(self):
         cells = self.browser.find_elements_by_class_name(self.cellCssClass)
@@ -18,6 +19,8 @@ class Matrix:
             for j in range(self.size):
                 stringValue = cells[i*self.size+j].text
                 intValue = int(stringValue) if stringValue.strip() else None
+                if intValue is not None:
+                    self.count += 1
                 row.append(intValue)
             matrix.append(row)
         return matrix
@@ -40,3 +43,9 @@ class Matrix:
                     helpers.setCellToOne(self.browser, cell)
                 elif value == 0:
                     helpers.setCellToZero(self.browser, cell)
+
+    def addOne(self):
+        self.count += 1
+
+    def isCompleted(self):
+        return self.count == self.size * self.size
