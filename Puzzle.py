@@ -49,8 +49,10 @@ class Puzzle:
         self.cells = self.matrix.readMatrix()
         self.matrix.printMatrix(self.cells)
 
-        tries = 10
-        for t in range(tries):
+        maxTries = 100
+        for t in range(maxTries):
+            if self.matrix.isCompleted():
+                break
             for i in range(self.size):
                 for j in range(self.size):
                     self.findPairs(i, j)
@@ -63,6 +65,7 @@ class Puzzle:
         # Eliminate other impossible combinations.
 
         # Guess and try.
+
         self.matrix.printMatrix(self.cells)
         if self.matrix.isCompleted():
             print('Yay! We did it!')
