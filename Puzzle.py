@@ -48,10 +48,10 @@ class Puzzle:
         # This is the matrix we start with
         self.matrix.print()
 
-        # Keep trying
-        maxTries = 100
+        # Keep trying until exhausted
+        maxTries = 200
         for t in range(maxTries):
-            if self.matrix.isCompleted():
+            if self.matrix.isComplete():
                 break
             for i in range(self.size):
                 for j in range(self.size):
@@ -61,18 +61,12 @@ class Puzzle:
                     self.findPairs(i, j)
                     self.avoidTrios(i, j)
             self.completeRowsAndCols()
+            self.eliminateImpossibleCombinations()
 
-        # Eliminate impossible combinations based on completed rows/columns:
-        # No identical rows/columns are allowed.
-
-        # Eliminate other impossible combinations.
-
-        # Guess and try.
-
-        if self.matrix.isCompleted():
+        if self.matrix.isComplete():
             print('Yay! We did it!')
         else:
-            print('Still need more work')
+            print('Still need more work..')
         # Draw the solution matrix on browser
         self.matrix.print()
         self.matrix.draw()
@@ -150,39 +144,44 @@ class Puzzle:
     def completeRowsAndCols(self):
         # For each row
         for i in range(self.size):
-            zeroCount = 0
-            oneCount = 0
-            for j in range(self.size):
-                if self.matrix.values[i][j] == 0:
-                    zeroCount += 1
-                elif self.matrix.values[i][j] == 1:
-                    oneCount += 1
-            if zeroCount == self.size/2 and oneCount < self.size/2:
+            if i in self.matrix.completeRows:
+                continue
+            if (self.matrix.count['row'][i][0] == self.size/2 and
+                    self.matrix.count['row'][i][1] < self.size/2):
                 for j in range(self.size):
                     if self.matrix.values[i][j] is None:
                         self.matrix.values[i][j] = 1
-                        self.matrix.addOne()
-            elif oneCount == self.size/2 and zeroCount < self.size/2:
+                        self.matrix.addOne(i, j, 1)
+            elif (self.matrix.count['row'][i][1] == self.size/2 and
+                    self.matrix.count['row'][i][0] < self.size/2):
                 for j in range(self.size):
                     if self.matrix.values[i][j] is None:
                         self.matrix.values[i][j] = 0
-                        self.matrix.addOne()
+                        self.matrix.addOne(i, j, 0)
         # For each col
         for j in range(self.size):
-            zeroCount = 0
-            oneCount = 0
-            for i in range(self.size):
-                if self.matrix.values[i][j] == 0:
-                    zeroCount += 1
-                elif self.matrix.values[i][j] == 1:
-                    oneCount += 1
-            if zeroCount == self.size/2 and oneCount < self.size/2:
+            if j in self.matrix.completeCols:
+                continue
+            if (self.matrix.count['col'][j][0] == self.size/2 and
+                    self.matrix.count['col'][j][1] < self.size/2):
                 for i in range(self.size):
                     if self.matrix.values[i][j] is None:
                         self.matrix.values[i][j] = 1
-                        self.matrix.addOne()
-            elif oneCount == self.size/2 and zeroCount < self.size/2:
+                        self.matrix.addOne(i, j, 1)
+            elif (self.matrix.count['col'][j][1] == self.size/2 and
+                    self.matrix.count['col'][j][0] < self.size/2):
                 for i in range(self.size):
                     if self.matrix.values[i][j] is None:
                         self.matrix.values[i][j] = 0
-                        self.matrix.addOne()
+                        self.matrix.addOne(i, j, 0)
+
+    # Eliminate impossible combinations based on completed rows/columns:
+    # No identical rows/columns are allowed.
+    def eliminateImpossibleCombinations(self):
+        # Get the closest to complete rows/columns
+        # Lay out all the possible combinations
+        # Check if it violates pairs or trios rules
+        # Check if it is identical to any rows/columns that are completed
+        # If we have one possible combination, this is the answer
+        # If we have multiple possible combinations, find the comman cells
+        return
