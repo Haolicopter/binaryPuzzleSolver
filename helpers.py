@@ -28,21 +28,21 @@ def getChromeDriver():
     return webdriver.Chrome(chromedriver, chrome_options=chrome_options)
 
 
-def setCellToOne(browser, cell):
+def drawOne(browser, cell):
     if cell.text == 0:
         ActionChains(browser).click(cell).perform()
     elif cell.text == '':
         ActionChains(browser).click(cell).click(cell).perform()
 
 
-def setCellToZero(browser, cell):
+def drawZero(browser, cell):
     if cell.text == '':
         ActionChains(browser).click(cell).perform()
     elif cell.text == '1':
         ActionChains(browser).click(cell).click(cell).perform()
 
 
-def setCellToNone(browser, cell):
+def drawNone(browser, cell):
     if cell.text == '1':
         ActionChains(browser).click(cell).perform()
     elif cell.text == '0':

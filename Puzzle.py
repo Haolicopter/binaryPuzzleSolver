@@ -144,44 +144,74 @@ class Puzzle:
     def completeRowsAndCols(self):
         # For each row
         for i in range(self.size):
-            if i in self.matrix.completeRows:
-                continue
             if (self.matrix.count['row'][i][0] == self.size/2 and
                     self.matrix.count['row'][i][1] < self.size/2):
                 for j in range(self.size):
                     if self.matrix.values[i][j] is None:
-                        self.matrix.values[i][j] = 1
-                        self.matrix.addOne(i, j, 1)
+                        self.matrix.setCell(i, j, 1)
             elif (self.matrix.count['row'][i][1] == self.size/2 and
                     self.matrix.count['row'][i][0] < self.size/2):
                 for j in range(self.size):
                     if self.matrix.values[i][j] is None:
-                        self.matrix.values[i][j] = 0
-                        self.matrix.addOne(i, j, 0)
+                        self.matrix.setCell(i, j, 0)
         # For each col
         for j in range(self.size):
-            if j in self.matrix.completeCols:
-                continue
             if (self.matrix.count['col'][j][0] == self.size/2 and
                     self.matrix.count['col'][j][1] < self.size/2):
                 for i in range(self.size):
                     if self.matrix.values[i][j] is None:
-                        self.matrix.values[i][j] = 1
-                        self.matrix.addOne(i, j, 1)
+                        self.matrix.setCell(i, j, 1)
             elif (self.matrix.count['col'][j][1] == self.size/2 and
                     self.matrix.count['col'][j][0] < self.size/2):
                 for i in range(self.size):
                     if self.matrix.values[i][j] is None:
-                        self.matrix.values[i][j] = 0
-                        self.matrix.addOne(i, j, 0)
+                        self.matrix.setCell(i, j, 0)
 
     # Eliminate impossible combinations based on completed rows/columns:
     # No identical rows/columns are allowed.
     def eliminateImpossibleCombinations(self):
-        # Get the closest to complete rows/columns
+        if len(self.matrix.nearCompleteVectors) == 0:
+            return
+
+        # Get the most promosing rows/columns
+        (vectorType, i, missingCount) = self.matrix.nearCompleteVectors[0]
+
         # Lay out all the possible combinations
-        # Check if it violates pairs or trios rules
-        # Check if it is identical to any rows/columns that are completed
+        candidates = self.matrix.getCandidates(vectorType, i, missingCount)
+        for candidate in candidates:
+            # Check if it violates pairs or trios rules
+            if self.matrix.isIllegal(candidate):
+                print('This is illegal')
+                candidates.remove(candidate)
+                continue
+            # Check if it is identical to any rows/columns that are completed
+            if self.matrix.hasDuplicatedVectors(vectorType, candidate):
+                print('Duplicated vectors!')
+                candidates.remove(candidate)
+                continue
+
         # If we have one possible combination, this is the answer
-        # If we have multiple possible combinations, find the comman cells
-        return
+        if len(candidates) == 1:
+            for cell in candidates[0]:
+                if cell['isGuess']:
+                    print('Drilled down to one possible combo')
+                    # TODO: bug here!
+                    self.matrix.setCell(cell['row'], cell['col'], cell['val'])
+        # If we have multiple possible combinations, find the common cells
+        elif len(candidates) > 1:
+            print('Found multiple candidates')
+            for x in range(len(candidate[0])):
+                cell = candidates[0][x]
+                if cell['isGuess'] is False:
+                    continue
+
+                isCommon = True
+                for i in range(1, len(candidates)):
+                    if cell['val'] != candidates[i][x]['val']:
+                        isCommon = False
+                        break
+                if isCommon:
+                    print('Find one common cell of multiple possible combos')
+                    self.matrix.setCell(cell['row'], cell['col'], cell['val'])
+        else:
+            print('No candidate found')
