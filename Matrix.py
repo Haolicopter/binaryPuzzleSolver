@@ -69,6 +69,10 @@ class Matrix:
         print(self.completeRows)
         print('Complete cols:')
         print(self.completeCols)
+        print('Near complete rows:')
+        print(self.nearCompleteRows)
+        print('Near complete cols:')
+        print(self.nearCompleteCols)
 
     # Draw the matrix on browser
     def draw(self):
@@ -141,6 +145,8 @@ class Matrix:
         # This row is completed
         if self.count['row'][i]['total'] == self.size:
             self.completeRows.append(i)
+            if i in self.nearCompleteRows:
+                self.nearCompleteRows.remove(i)
         # This row is near complete
         elif self.count['row'][i]['total'] + threshold >= self.size:
             self.nearCompleteRows.append(i)
@@ -148,6 +154,8 @@ class Matrix:
         # This col is completed
         if self.count['col'][j]['total'] == self.size:
             self.completeCols.append(j)
+            if i in self.nearCompleteCols:
+                self.nearCompleteCols.remove(i)
         # This col is near complete
         elif self.count['col'][j]['total'] + threshold >= self.size:
             self.nearCompleteCols.append(j)
