@@ -94,7 +94,8 @@ class Matrix:
         self.count['row'][i]['total'] += 1
         self.count['col'][j][value] += 1
         self.count['col'][j]['total'] += 1
-        self.updateCurrentVectorCompleteness(i, j)
+        self.updateVectorCompleteness('row', i)
+        self.updateVectorCompleteness('col', j)
 
     # Set cell value and add count
     def setCell(self, i, j, value):
@@ -102,13 +103,25 @@ class Matrix:
             return
         if self.values[i][j] is not None:
             return
-        # print('Setting ['+str(i)+','+str(j)+'] from ' + str(self.values[i][j]) + ' to '+str(value))
+        print('Setting ['+str(i)+','+str(j)+'] from ' + str(self.values[i][j]) + ' to '+str(value))
         self.values[i][j] = value
         self.addCount(i, j, value)
 
     # Check if the matrix is complete
     def isComplete(self):
         return self.totalCount == self.size * self.size
+
+    # Check if the matrix solution is correct
+    def isCorrect(self):
+        if not self.isComplete():
+            return False
+        for i in range(self.size):
+            for v in self.vectorTypes:
+                if (self.count[v][i]['total'] != self.size or
+                        self.count[v][i][0] != self.size/2 or
+                        self.count[v][i][1] != self.size/2):
+                    return False
+        return True
 
     # Check if index is in range
     def indexIsInRange(self, row, col):
@@ -144,33 +157,35 @@ class Matrix:
     # Check for complete and near complete rows/columns
     def updateCompleteness(self):
         for i in range(self.size):
-            self.updateCurrentVectorCompleteness(i, i)
+            self.updateVectorCompleteness('row', i)
+            self.updateVectorCompleteness('col', i)
 
     # Check for complete and near complete for current row/column
-    def updateCurrentVectorCompleteness(self, i, j):
-        for vectorType in self.vectorTypes:
-            vectorMissingCells = self.size - self.count[vectorType][i]['total']
-            vector = (vectorType, i, vectorMissingCells)
-            # This vector is complete
-            if vectorMissingCells == 0:
-                # Add to complete vector list if does not exist
-                if vector not in self.completeVectors:
-                    self.completeVectors.append(vector)
-                # Remove from near complete vector list if exists
-                self.nearCompleteVectors = list(filter(
-                    lambda v: not (v[0] == vectorType and v[1] == i),
-                    self.nearCompleteVectors))
-            # This vector is near complete
-            elif vectorMissingCells <= self.maxComboSize:
-                oldVector = None
-                for (vv, ii, mm) in self.nearCompleteVectors:
-                    if vv == vectorType and ii == i:
-                        oldVector = (vv, ii, mm)
-                if oldVector is not None:
-                    self.nearCompleteVectors.remove(oldVector)
-                self.nearCompleteVectors.append(vector)
-                # Sort by number of missing cells
-                self.nearCompleteVectors.sort(key=lambda row: row[2])
+    def updateVectorCompleteness(self, vectorType, i):
+        vectorMissingCells = self.size - self.count[vectorType][i]['total']
+        vector = (vectorType, i, vectorMissingCells)
+        # This vector is complete
+        if vectorMissingCells == 0:
+            print(vectorType + str(i) + ' is complete')
+            # Add to complete vector list if does not exist
+            if vector not in self.completeVectors:
+                print('adding to the complete vectors')
+                self.completeVectors.append(vector)
+            # Remove from near complete vector list if exists
+            self.nearCompleteVectors = list(filter(
+                lambda v: not (v[0] == vectorType and v[1] == i),
+                self.nearCompleteVectors))
+        # This vector is near complete
+        elif vectorMissingCells <= self.maxComboSize:
+            oldVector = None
+            for (vv, ii, mm) in self.nearCompleteVectors:
+                if vv == vectorType and ii == i:
+                    oldVector = (vv, ii, mm)
+            if oldVector is not None:
+                self.nearCompleteVectors.remove(oldVector)
+            self.nearCompleteVectors.append(vector)
+            # Sort by number of missing cells
+            self.nearCompleteVectors.sort(key=lambda row: row[2])
 
     # Get all combination given missing number of zeros and ones
     def getCombos(self, vectorType, i, missingCount):
@@ -223,6 +238,11 @@ class Matrix:
                     (1, 0, 0, 0)
                 ]
 
+        # print('Failed to create combos:')
+        # print(str(missingCount))
+        # print(vectorType + str(i))
+        # print('num of zeros: ' + str(self.count[vectorType][i][0]))
+        # print('num of ones: ' + str(self.count[vectorType][i][1]))
         return []
 
     # Get row/col candidates

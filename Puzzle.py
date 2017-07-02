@@ -61,15 +61,19 @@ class Puzzle:
                     self.findPairs(i, j)
                     self.avoidTrios(i, j)
             self.completeRowsAndCols()
-            self.eliminateImpossibleCombinations()
+            self.solveNearComplete()
 
         if self.matrix.isComplete():
-            print('Yay! We did it!')
+            if self.matrix.isCorrect():
+                print('Yay! We did it!')
+            else:
+                print('Sorry but the solution is not correct')
         else:
             print(
                 'Still need more work.. We solved '
                 + str(self.matrix.totalCount)
-                + ' out of ' + str(self.size*self.size))
+                + ' out of '
+                + str(self.size*self.size))
         # Draw the solution matrix on browser
         self.matrix.print()
         self.matrix.draw()
@@ -170,41 +174,48 @@ class Puzzle:
                     if self.matrix.values[i][j] is None:
                         self.matrix.setCell(i, j, 0)
 
-    # Eliminate impossible combinations based on completed rows/columns:
-    # No identical rows/columns are allowed.
-    def eliminateImpossibleCombinations(self):
+    # Try solving near complete rows/cols
+    def solveNearComplete(self):
         if len(self.matrix.nearCompleteVectors) == 0:
             return
+        for (vectorType, i, missingCount) in self.matrix.nearCompleteVectors:
+            self.eliminateImpossibleCombinations(vectorType, i, missingCount)
 
-        # Get the most promosing rows/columns
-        (vectorType, i, missingCount) = self.matrix.nearCompleteVectors[0]
-
+    # Eliminate impossible combinations based on completed rows/columns:
+    # No identical rows/columns are allowed.
+    def eliminateImpossibleCombinations(self, vectorType, i, missingCount):
         # Lay out all the possible combinations
         candidates = self.matrix.getCandidates(vectorType, i, missingCount)
         for candidate in candidates:
+            print(candidate)
             # Check if it violates pairs or trios rules
             if self.matrix.isIllegal(candidate):
+                print('Sorry but is illegal')
                 candidates.remove(candidate)
                 continue
             # Check if it is identical to any rows/columns that are completed
             if self.matrix.hasDuplicatedVectors(vectorType, candidate):
+                print('Sorry but hasDuplicatedVectors')
                 candidates.remove(candidate)
                 continue
 
         # If we have one possible combination, this is the answer
         if len(candidates) == 1:
+            print('One possible combination!')
             for cell in candidates[0]:
                 if cell['isGuess']:
                     self.matrix.setCell(cell['row'], cell['col'], cell['val'])
         # If we have multiple possible combinations, find the common cells
         elif len(candidates) > 1:
-            for x in range(len(candidate[0])):
+            print('Attention! checking ' + str(len(candidates)) + ' candidates...')
+            for x in range(len(candidates[0])):
                 cell = candidates[0][x]
                 if cell['isGuess'] is False:
                     continue
-
+                print('checking cell ' + str(x) + ' with rest of the candidates:')
                 isCommon = True
                 for i in range(1, len(candidates)):
+                    print(str(cell['val']) + ' ?= ' + str(candidates[i][x]['val']))
                     if cell['val'] != candidates[i][x]['val']:
                         isCommon = False
                         break
