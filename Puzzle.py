@@ -189,13 +189,11 @@ class Puzzle:
         for candidate in candidates:
             print(candidate)
             # Check if it violates pairs or trios rules
-            if self.matrix.isIllegal(candidate):
-                print('Sorry but is illegal')
+            if self.matrix.violatesRules(vectorType, candidate):
                 candidates.remove(candidate)
                 continue
             # Check if it is identical to any rows/columns that are completed
             if self.matrix.hasDuplicatedVectors(vectorType, candidate):
-                print('Sorry but hasDuplicatedVectors')
                 candidates.remove(candidate)
                 continue
 

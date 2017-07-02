@@ -283,12 +283,31 @@ class Matrix:
         else:
             raise Exception('Unknown vector type!')
 
+    # Check if it violates rules
+    def violatesRules(self, vectorType, candidate):
+        vector = []
+        for x in range(len(candidate)):
+            vector.append(candidate[x]['val'])
+        if self.hasThreeOrMoreConsecutiveSameNumber(vector):
+            return True
+
+        for j in range(len(candidate)):
+            if candidate[j]['isGuess']:
+                crossVector = []
+                for i in range(self.size):
+                    (row, col) = self.getRowAndColIndexes(vectorType, i, j)
+                    crossVector.append(self.values[row][col])
+                if self.hasThreeOrMoreConsecutiveSameNumber(crossVector):
+                    return True
+
+        return False
+
     # Check if it has consecutive three or more zeros/ones
-    def isIllegal(self, vector):
+    def hasThreeOrMoreConsecutiveSameNumber(self, vector):
         previous = None
         streak = 0
         for x in range(len(vector)):
-            current = vector[x]['val']
+            current = vector[x]
             if current == previous:
                 streak += 1
                 if streak >= 2:
