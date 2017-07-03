@@ -120,6 +120,9 @@ class Matrix:
                 if (self.count[v][i]['total'] != self.size or
                         self.count[v][i][0] != self.size/2 or
                         self.count[v][i][1] != self.size/2):
+                    print(v + str(i)
+                            + ' has ' + str(self.count[v][i][0]) + ' zeros'
+                            + ' and ' + str(self.count[v][i][1]) + ' ones')
                     return False
         return True
 
@@ -132,7 +135,10 @@ class Matrix:
         return True
 
     # Set the adjacent cells of neighbours to the other number
-    def setNeighbours(self, neighbours, current):
+    def setNeighbours(self, neighbours, current, log=False):
+        if log:
+            print('Before setting neighbours:', self.values[0])
+            print(neighbours)
         for neighbour in neighbours:
             row = neighbour['row']
             col = neighbour['col']
@@ -145,7 +151,12 @@ class Matrix:
                     if (self.indexIsInRange(adjRow, adjCol) and
                             self.values[adjRow][adjCol] is None):
                         # Set the adjcent to the other number
+                        if log:
+                            print('Setting cells at (' + str(adjRow) + ', ' + str(adjCol) + ') to ', str(1-current))
                         self.setCell(adjRow, adjCol, 1 - current)
+
+        if log:
+            print('After setting neighbours:', self.values[0])
 
     # Count the not none cells in rows/columns
     def countRowsAndCols(self):
@@ -284,7 +295,9 @@ class Matrix:
             raise Exception('Unknown vector type!')
 
     # Check if it violates rules
-    def violatesRules(self, vectorType, candidate):
+    def violatesRules(self, vectorType, candidate, log=False):
+        if log:
+            print(self.values)
         vector = []
         for x in range(len(candidate)):
             vector.append(candidate[x]['val'])
@@ -295,8 +308,11 @@ class Matrix:
             if candidate[j]['isGuess']:
                 crossVector = []
                 for i in range(self.size):
-                    (row, col) = self.getRowAndColIndexes(vectorType, i, j)
-                    crossVector.append(self.values[row][col])
+                    if i == candidate[j][vectorType]:
+                        crossVector.append(candidate[j]['val'])
+                    else:
+                        (row, col) = self.getRowAndColIndexes(vectorType, i, j)
+                        crossVector.append(self.values[row][col])
                 if self.hasThreeOrMoreConsecutiveSameNumber(crossVector):
                     return True
 
@@ -304,18 +320,21 @@ class Matrix:
 
     # Check if it has consecutive three or more zeros/ones
     def hasThreeOrMoreConsecutiveSameNumber(self, vector):
+        print('Checking violation for ', vector)
         previous = None
         streak = 0
         for x in range(len(vector)):
             current = vector[x]
-            if current == previous:
+            if current == previous and current is not None:
                 streak += 1
                 if streak >= 2:
+                    print('violated!')
                     return True
             else:
                 streak = 0
             previous = current
 
+        print('nope, no violation')
         return False
 
     # Check if matrix has duplicated rows/cols
