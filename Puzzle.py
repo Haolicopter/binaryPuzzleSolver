@@ -184,36 +184,49 @@ class Puzzle:
     # Eliminate impossible combinations based on completed rows/columns:
     # No identical rows/columns are allowed.
     def eliminateImpossibleCombinations(self, vectorType, i, missingCount):
+        print('Calling eliminateImpossibleCombinations method at '
+              + vectorType + str(i) + ' with '
+              + str(missingCount) + ' missing cells')
         # Lay out all the possible combinations
         candidates = self.matrix.getCandidates(vectorType, i, missingCount)
+        log = False
+        if i == 11 and vectorType == 'row':
+            print('Before checking: ', candidates)
+            log = True
+
+        wrongCandidates = []
         for candidate in candidates:
-            print(candidate)
+            print('Checking this candidate:', candidate)
             # Check if it violates pairs or trios rules
-            if self.matrix.violatesRules(vectorType, candidate):
-                candidates.remove(candidate)
+            if self.matrix.violatesRules(vectorType, candidate, log):
+                wrongCandidates.append(candidate)
                 continue
             # Check if it is identical to any rows/columns that are completed
             if self.matrix.hasDuplicatedVectors(vectorType, candidate):
-                candidates.remove(candidate)
+                wrongCandidates.append(candidate)
                 continue
+
+        for wrongCandidate in wrongCandidates:
+            candidates.remove(wrongCandidate)
+
+        if i == 11 and vectorType == 'row':
+            print('After checking: ', candidates)
 
         # If we have one possible combination, this is the answer
         if len(candidates) == 1:
-            print('One possible combination!')
+            # print('One possible combination!')
             for cell in candidates[0]:
                 if cell['isGuess']:
                     self.matrix.setCell(cell['row'], cell['col'], cell['val'])
         # If we have multiple possible combinations, find the common cells
         elif len(candidates) > 1:
-            print('Attention! checking ' + str(len(candidates)) + ' candidates...')
+            # print('Checking ' + str(len(candidates)) + ' candidates...')
             for x in range(len(candidates[0])):
                 cell = candidates[0][x]
                 if cell['isGuess'] is False:
                     continue
-                print('checking cell ' + str(x) + ' with rest of the candidates:')
                 isCommon = True
                 for i in range(1, len(candidates)):
-                    print(str(cell['val']) + ' ?= ' + str(candidates[i][x]['val']))
                     if cell['val'] != candidates[i][x]['val']:
                         isCommon = False
                         break
