@@ -78,10 +78,7 @@ class Matrix:
                 value = self.values[i][j]
                 cellCssId = '#cel_' + str(i+1) + '_' + str(j+1)
                 cell = self.browser.find_element_by_css_selector(cellCssId)
-                if value == 1:
-                    helpers.drawOne(self.browser, cell)
-                elif value == 0:
-                    helpers.drawZero(self.browser, cell)
+                helpers.drawCell(self.browser, cell, value)
 
     # Set cell at given position to given value
     def addCount(self, i, j, value):

@@ -28,6 +28,15 @@ def getChromeDriver():
     return webdriver.Chrome(chromedriver, chrome_options=chrome_options)
 
 
+def drawCell(browser, cell, val):
+    if val == 1:
+        drawOne(browser, cell)
+    elif val == 0:
+        drawZero(browser, cell)
+    else:
+        drawNone(browser, cell)
+
+
 def drawOne(browser, cell):
     if cell.text == 0:
         ActionChains(browser).click(cell).perform()
