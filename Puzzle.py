@@ -76,9 +76,8 @@ class Puzzle:
                 + str(self.matrix.totalCount)
                 + ' out of '
                 + str(self.size*self.size))
-        # Draw the solution matrix on browser
+
         self.matrix.print()
-        self.matrix.draw()
 
     # Find pairs:
     # Because no more than two similar numbers next to or below each other

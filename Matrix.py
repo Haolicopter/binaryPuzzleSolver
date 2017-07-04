@@ -100,9 +100,14 @@ class Matrix:
             return
         if self.values[i][j] is not None:
             return
+
         print('Setting ['+str(i)+','+str(j)+'] from ' + str(self.values[i][j]) + ' to '+str(value))
         self.values[i][j] = value
         self.addCount(i, j, value)
+
+        cellCssId = '#cel_' + str(i+1) + '_' + str(j+1)
+        cell = self.browser.find_element_by_css_selector(cellCssId)
+        helpers.drawCell(self.browser, cell, value)
 
     # Check if the matrix is complete
     def isComplete(self):
