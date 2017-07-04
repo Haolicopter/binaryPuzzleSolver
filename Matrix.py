@@ -219,11 +219,12 @@ class Matrix:
     # Get all combination given missing number of zeros and ones
     def getCombos(self, vectorType, i, missingCount):
         if missingCount == 2:
-            # One zero and one one, no doubt
-            return [
-                (0, 1),
-                (1, 0)
-            ]
+            if self.count[vectorType][i][0] == 1:
+                # One zero and one one, no doubt
+                return [
+                    (0, 1),
+                    (1, 0)
+                ]
         elif missingCount == 3:
             if self.count[vectorType][i][0] == self.size/2 - 1:
                 # One zero and two ones
