@@ -5,8 +5,8 @@ from Puzzle import Puzzle
 
 puzzle = Puzzle()
 puzzle.set(
-    Puzzle.DIFFICULTY['medium'],
+    Puzzle.DIFFICULTY['hard'],
     Puzzle.LEVEL[1],
-    Puzzle.SIZE['10*10']
+    Puzzle.SIZE['12*12']
 )
 puzzle.play()
