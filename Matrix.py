@@ -101,7 +101,8 @@ class Matrix:
         if self.values[i][j] is not None:
             return
 
-        print('Setting ['+str(i)+','+str(j)+'] from ' + str(self.values[i][j]) + ' to '+str(value))
+        print('Setting [' + str(i) + ',' + str(j) + '] from '
+              + str(self.values[i][j]) + ' to ' + str(value))
         self.values[i][j] = value
         self.addCount(i, j, value)
 
@@ -179,6 +180,9 @@ class Matrix:
         vector = (vectorType, i, vectorMissingCells)
         # This vector is complete
         if vectorMissingCells == 0:
+            if self.checkCorrectness(vectorType, i) is False:
+                print(vector)
+                raise Exception(vectorType + str(i) + ' isnt correct, abort!')
             print(vectorType + str(i) + ' is complete')
             # Add to complete vector list if does not exist
             if vector not in self.completeVectors:
@@ -199,6 +203,18 @@ class Matrix:
             self.nearCompleteVectors.append(vector)
             # Sort by number of missing cells
             self.nearCompleteVectors.sort(key=lambda row: row[2])
+
+    # Check if vector is correct
+    # Aka, having equal number of zeros and ones and no missing element
+    def checkCorrectness(self, vectorType, i):
+        if self.count[vectorType][i]['total'] != self.size:
+            return False
+        if self.count[vectorType][i][0] != self.size/2:
+            return False
+        if self.count[vectorType][i][1] != self.size/2:
+            return False
+
+        return True
 
     # Get all combination given missing number of zeros and ones
     def getCombos(self, vectorType, i, missingCount):
