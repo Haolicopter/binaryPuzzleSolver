@@ -58,23 +58,32 @@ class Puzzle:
                     # Only check for cell with values
                     if self.matrix.values[i][j] is None:
                         continue
+                    print('Checking for cell at (',
+                          str(i), ', ' + str(j) + ')')
                     self.findPairs(i, j)
                     self.avoidTrios(i, j)
             self.completeRowsAndCols()
-            self.eliminateImpossibleCombinations()
+            self.solveNearComplete()
 
         if self.matrix.isComplete():
-            print('Yay! We did it!')
+            if self.matrix.isCorrect():
+                print('Yay! We did it!')
+            else:
+                print('Sorry but the solution is not correct')
         else:
-            print('Still need more work..')
-        # Draw the solution matrix on browser
+            print(
+                'Still need more work.. We solved '
+                + str(self.matrix.totalCount)
+                + ' out of '
+                + str(self.size*self.size))
+
         self.matrix.print()
-        self.matrix.draw()
 
     # Find pairs:
     # Because no more than two similar numbers next to or below each other
     # are allowed, pairs can be supplementen with the other number.
     def findPairs(self, i, j):
+        print('Calling findPairs method...')
         neighbours = [
             {
                 'row': i-1, 'col': j,
@@ -105,12 +114,17 @@ class Puzzle:
                 ]
             }
         ]
-        self.matrix.setNeighbours(neighbours, self.matrix.values[i][j])
+        if i == 0:
+            log = True
+        else:
+            log = False
+        self.matrix.setNeighbours(neighbours, self.matrix.values[i][j], log)
 
     # Avoid trios:
     # If two cells contain the same number with an empty cell in between,
     # this empty cell should contain the other number.
     def avoidTrios(self, i, j):
+        print('Calling avoidTrios method...')
         neighbours = [
             {
                 'row': i-2, 'col': j,
@@ -142,46 +156,87 @@ class Puzzle:
     # Complete rows and columns:
     # Each row and each column should contain an equal number of 1s and 0s.
     def completeRowsAndCols(self):
+        print('Calling completeRowsAndCols method...')
         # For each row
         for i in range(self.size):
-            if i in self.matrix.completeRows:
-                continue
             if (self.matrix.count['row'][i][0] == self.size/2 and
                     self.matrix.count['row'][i][1] < self.size/2):
                 for j in range(self.size):
                     if self.matrix.values[i][j] is None:
-                        self.matrix.values[i][j] = 1
-                        self.matrix.addOne(i, j, 1)
+                        self.matrix.setCell(i, j, 1)
             elif (self.matrix.count['row'][i][1] == self.size/2 and
                     self.matrix.count['row'][i][0] < self.size/2):
                 for j in range(self.size):
                     if self.matrix.values[i][j] is None:
-                        self.matrix.values[i][j] = 0
-                        self.matrix.addOne(i, j, 0)
+                        self.matrix.setCell(i, j, 0)
         # For each col
         for j in range(self.size):
-            if j in self.matrix.completeCols:
-                continue
             if (self.matrix.count['col'][j][0] == self.size/2 and
                     self.matrix.count['col'][j][1] < self.size/2):
                 for i in range(self.size):
                     if self.matrix.values[i][j] is None:
-                        self.matrix.values[i][j] = 1
-                        self.matrix.addOne(i, j, 1)
+                        self.matrix.setCell(i, j, 1)
             elif (self.matrix.count['col'][j][1] == self.size/2 and
                     self.matrix.count['col'][j][0] < self.size/2):
                 for i in range(self.size):
                     if self.matrix.values[i][j] is None:
-                        self.matrix.values[i][j] = 0
-                        self.matrix.addOne(i, j, 0)
+                        self.matrix.setCell(i, j, 0)
+
+    # Try solving near complete rows/cols
+    def solveNearComplete(self):
+        if len(self.matrix.nearCompleteVectors) == 0:
+            return
+        for (vectorType, i, missingCount) in self.matrix.nearCompleteVectors:
+            self.eliminateImpossibleCombinations(vectorType, i, missingCount)
 
     # Eliminate impossible combinations based on completed rows/columns:
     # No identical rows/columns are allowed.
-    def eliminateImpossibleCombinations(self):
-        # Get the closest to complete rows/columns
+    def eliminateImpossibleCombinations(self, vectorType, i, missingCount):
+        print('Calling eliminateImpossibleCombinations method at '
+              + vectorType + str(i) + ' with '
+              + str(missingCount) + ' missing cells')
         # Lay out all the possible combinations
-        # Check if it violates pairs or trios rules
-        # Check if it is identical to any rows/columns that are completed
+        candidates = self.matrix.getCandidates(vectorType, i, missingCount)
+        log = False
+        if i == 11 and vectorType == 'row':
+            print('Before checking: ', candidates)
+            log = True
+
+        wrongCandidates = []
+        for candidate in candidates:
+            print('Checking this candidate:', candidate)
+            # Check if it violates pairs or trios rules
+            if self.matrix.violatesRules(vectorType, candidate, log):
+                wrongCandidates.append(candidate)
+                continue
+            # Check if it is identical to any rows/columns that are completed
+            if self.matrix.hasDuplicatedVectors(vectorType, candidate):
+                wrongCandidates.append(candidate)
+                continue
+
+        for wrongCandidate in wrongCandidates:
+            candidates.remove(wrongCandidate)
+
+        if i == 11 and vectorType == 'row':
+            print('After checking: ', candidates)
+
         # If we have one possible combination, this is the answer
-        # If we have multiple possible combinations, find the comman cells
-        return
+        if len(candidates) == 1:
+            # print('One possible combination!')
+            for cell in candidates[0]:
+                if cell['isGuess']:
+                    self.matrix.setCell(cell['row'], cell['col'], cell['val'])
+        # If we have multiple possible combinations, find the common cells
+        elif len(candidates) > 1:
+            # print('Checking ' + str(len(candidates)) + ' candidates...')
+            for x in range(len(candidates[0])):
+                cell = candidates[0][x]
+                if cell['isGuess'] is False:
+                    continue
+                isCommon = True
+                for i in range(1, len(candidates)):
+                    if cell['val'] != candidates[i][x]['val']:
+                        isCommon = False
+                        break
+                if isCommon:
+                    self.matrix.setCell(cell['row'], cell['col'], cell['val'])
