@@ -8,9 +8,8 @@ Running environment: `Mac OSX Sierra`
 
 Language: `Python 3.6.1`
 
-<!-- ![demo](demo.gif) -->
 <p>
 	<a href="demo.gif" target="_blank">
-		<img src="demo.gif" alt="demo"" style="max-width:100%;">
+		<img src="demo.gif" alt="demo"" style="width:100%;">
 	</a>
 </p>
