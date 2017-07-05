@@ -9,7 +9,7 @@ Running environment: `Mac OSX Sierra`
 Language: `Python 3.6.1`
 
 <p>
-	<a href="demo.gif" target="_blank">
+	<a href="demo.gif" target="_blank" style="width:100%;">
 		<img src="demo.gif" alt="demo"" style="width:100%;">
 	</a>
 </p>
