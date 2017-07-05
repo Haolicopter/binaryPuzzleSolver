@@ -12,7 +12,7 @@ Testing OS: `Mac OSX Sierra`
 
 ## Demo
 <p>
-	<a href="demo.gif" target="_blank" style="width:100%;">
+	<a href="demo.gif" target="_blank">
 		<img src="demo.gif" alt="demo"" style="width:100%;">
 	</a>
 </p>
