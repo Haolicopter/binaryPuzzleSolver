@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import helpers
-from Combo import Combo
+import itertools
 
 
 class Matrix:
@@ -34,7 +34,8 @@ class Matrix:
         self.completeVectors = []
         self.nearCompleteVectors = []
 
-        self.combo = Combo()
+        # We can guess up to this many missing cells
+        self.maxComboSize = 5
 
         self.load()
         self.countRowsAndCols()
@@ -185,7 +186,7 @@ class Matrix:
                 lambda v: not (v[0] == vectorType and v[1] == i),
                 self.nearCompleteVectors))
         # This vector is near complete
-        elif vectorMissingCells <= self.combo.getMaxSize():
+        elif vectorMissingCells <= self.maxComboSize:
             oldVector = None
             for (vv, ii, mm) in self.nearCompleteVectors:
                 if vv == vectorType and ii == i:
@@ -208,11 +209,16 @@ class Matrix:
 
         return True
 
+    # Generate all permutations given number of ones and zeros
+    def getCombo(zeros, ones):
+        return list(set(list(itertools.permutations([0]*zeros + [1]*ones))))
+
     # Get row/col candidates
     def getCandidates(self, vectorType, i, missingCount):
         candidates = []
-        combos = self.combo.get(
-            self.count, self.size, vectorType, i, missingCount)
+        combos = self.getCombo(
+            self.size/2 - self.count[vectorType][i][0],
+            self.size/2 - self.count[vectorType][i][1])
         for combo in combos:
             count = 0
             candidate = []
