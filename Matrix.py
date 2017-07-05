@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import helpers
+import itertools
 
 
 class Matrix:
@@ -34,7 +35,7 @@ class Matrix:
         self.nearCompleteVectors = []
 
         # We can guess up to this many missing cells
-        self.maxComboSize = 4
+        self.maxComboSize = 5
 
         self.load()
         self.countRowsAndCols()
@@ -138,10 +139,7 @@ class Matrix:
         return True
 
     # Set the adjacent cells of neighbours to the other number
-    def setNeighbours(self, neighbours, current, log=False):
-        if log:
-            print('Before setting neighbours:', self.values[0])
-            print(neighbours)
+    def setNeighbours(self, neighbours, current):
         for neighbour in neighbours:
             row = neighbour['row']
             col = neighbour['col']
@@ -154,12 +152,7 @@ class Matrix:
                     if (self.indexIsInRange(adjRow, adjCol) and
                             self.values[adjRow][adjCol] is None):
                         # Set the adjcent to the other number
-                        if log:
-                            print('Setting cells at (' + str(adjRow) + ', ' + str(adjCol) + ') to ', str(1-current))
                         self.setCell(adjRow, adjCol, 1 - current)
-
-        if log:
-            print('After setting neighbours:', self.values[0])
 
     # Count the not none cells in rows/columns
     def countRowsAndCols(self):
@@ -216,69 +209,16 @@ class Matrix:
 
         return True
 
-    # Get all combination given missing number of zeros and ones
-    def getCombos(self, vectorType, i, missingCount):
-        if missingCount == 2:
-            if self.count[vectorType][i][0] == 1:
-                # One zero and one one, no doubt
-                return [
-                    (0, 1),
-                    (1, 0)
-                ]
-        elif missingCount == 3:
-            if self.count[vectorType][i][0] == self.size/2 - 1:
-                # One zero and two ones
-                return [
-                    (1, 1, 0),
-                    (1, 0, 1),
-                    (0, 1, 1)
-                ]
-            elif self.count[vectorType][i][1] == self.size/2 - 1:
-                # One one and two zeros
-                return [
-                    (0, 0, 1),
-                    (0, 1, 0),
-                    (1, 0, 0)
-                ]
-        elif missingCount == 4:
-            if self.count[vectorType][i][0] == self.size/2 - 1:
-                # One zero and three ones
-                return [
-                    (1, 1, 1, 0),
-                    (1, 1, 0, 1),
-                    (1, 0, 1, 1),
-                    (0, 1, 1, 1)
-                ]
-            elif self.count[vectorType][i][0] == self.size/2 - 2:
-                # Two zeros and two ones
-                return [
-                    (0, 0, 1, 1),
-                    (0, 1, 0, 1),
-                    (0, 1, 1, 0),
-                    (1, 1, 0, 0),
-                    (1, 0, 1, 0),
-                    (1, 0, 0, 1)
-                ]
-            elif self.count[vectorType][i][1] == self.size/2 - 1:
-                # One one and three zeros
-                return [
-                    (0, 0, 0, 1),
-                    (0, 0, 1, 0),
-                    (0, 1, 0, 0),
-                    (1, 0, 0, 0)
-                ]
-
-        # print('Failed to create combos:')
-        # print(str(missingCount))
-        # print(vectorType + str(i))
-        # print('num of zeros: ' + str(self.count[vectorType][i][0]))
-        # print('num of ones: ' + str(self.count[vectorType][i][1]))
-        return []
+    # Generate all permutations given number of ones and zeros
+    def getCombo(zeros, ones):
+        return list(set(list(itertools.permutations([0]*zeros + [1]*ones))))
 
     # Get row/col candidates
     def getCandidates(self, vectorType, i, missingCount):
         candidates = []
-        combos = self.getCombos(vectorType, i, missingCount)
+        combos = self.getCombo(
+            self.size/2 - self.count[vectorType][i][0],
+            self.size/2 - self.count[vectorType][i][1])
         for combo in combos:
             count = 0
             candidate = []
@@ -314,9 +254,7 @@ class Matrix:
             raise Exception('Unknown vector type!')
 
     # Check if it violates rules
-    def violatesRules(self, vectorType, candidate, log=False):
-        if log:
-            print(self.values)
+    def violatesRules(self, vectorType, candidate):
         vector = []
         for x in range(len(candidate)):
             vector.append(candidate[x]['val'])

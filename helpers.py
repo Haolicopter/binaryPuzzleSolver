@@ -2,17 +2,8 @@
 
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
-from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.action_chains import ActionChains
 import os
-
-
-def elementExist(driver, cssSelector):
-    try:
-        driver.find_element_by_css_selector(cssSelector)
-    except NoSuchElementException:
-        return False
-    return True
 
 
 def getChromeDriver():

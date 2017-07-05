@@ -114,11 +114,7 @@ class Puzzle:
                 ]
             }
         ]
-        if i == 0:
-            log = True
-        else:
-            log = False
-        self.matrix.setNeighbours(neighbours, self.matrix.values[i][j], log)
+        self.matrix.setNeighbours(neighbours, self.matrix.values[i][j])
 
     # Avoid trios:
     # If two cells contain the same number with an empty cell in between,
@@ -197,16 +193,11 @@ class Puzzle:
               + str(missingCount) + ' missing cells')
         # Lay out all the possible combinations
         candidates = self.matrix.getCandidates(vectorType, i, missingCount)
-        log = False
-        if i == 11 and vectorType == 'row':
-            print('Before checking: ', candidates)
-            log = True
 
         wrongCandidates = []
         for candidate in candidates:
-            print('Checking this candidate:', candidate)
             # Check if it violates pairs or trios rules
-            if self.matrix.violatesRules(vectorType, candidate, log):
+            if self.matrix.violatesRules(vectorType, candidate):
                 wrongCandidates.append(candidate)
                 continue
             # Check if it is identical to any rows/columns that are completed
@@ -217,18 +208,13 @@ class Puzzle:
         for wrongCandidate in wrongCandidates:
             candidates.remove(wrongCandidate)
 
-        if i == 11 and vectorType == 'row':
-            print('After checking: ', candidates)
-
         # If we have one possible combination, this is the answer
         if len(candidates) == 1:
-            # print('One possible combination!')
             for cell in candidates[0]:
                 if cell['isGuess']:
                     self.matrix.setCell(cell['row'], cell['col'], cell['val'])
         # If we have multiple possible combinations, find the common cells
         elif len(candidates) > 1:
-            # print('Checking ' + str(len(candidates)) + ' candidates...')
             for x in range(len(candidates[0])):
                 cell = candidates[0][x]
                 if cell['isGuess'] is False:
