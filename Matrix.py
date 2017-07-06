@@ -35,7 +35,7 @@ class Matrix:
         self.nearCompleteVectors = []
 
         # We can guess up to this many missing cells
-        self.maxComboSize = 5
+        self.maxComboSize = 7
 
         self.load()
         self.countRowsAndCols()
