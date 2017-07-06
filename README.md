@@ -12,7 +12,5 @@ Testing OS: `Mac OSX Sierra`
 
 ## Demo (Diffculty: Very Hard, Size: 14*14)
 <p>
-	<a href="https://raw.githubusercontent.com/Haolicopter/binaryPuzzleSolver/master/demo-very-hard.gif" target="_blank">
-		<img src="demo-very-hard.gif" alt="demo"" style="width:100%;">
-	</a>
+	<img src="demo-very-hard.gif" alt="demo"" style="width:100%;">
 </p>
