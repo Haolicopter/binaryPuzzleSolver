@@ -10,9 +10,9 @@ Language: `Python 3.6.1`
 
 Testing OS: `Mac OSX Sierra`
 
-## Demo
+## Demo (Diffculty: Very Hard, Size: 14*14)
 <p>
-	<a href="https://raw.githubusercontent.com/Haolicopter/binaryPuzzleSolver/play-with-readme/demo.gif" target="_blank">
-		<img src="demo.gif" alt="demo"" style="width:100%;">
+	<a href="https://raw.githubusercontent.com/Haolicopter/binaryPuzzleSolver/master/demo-very-hard.gif" target="_blank">
+		<img src="demo-very-hard.gif" alt="demo"" style="width:100%;">
 	</a>
 </p>
