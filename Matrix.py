@@ -210,7 +210,9 @@ class Matrix:
         return True
 
     # Generate all permutations given number of ones and zeros
-    def getCombo(zeros, ones):
+    def getCombo(self, zeros, ones):
+        zeros = int(zeros)
+        ones = int(ones)
         return list(set(list(itertools.permutations([0]*zeros + [1]*ones))))
 
     # Get row/col candidates
