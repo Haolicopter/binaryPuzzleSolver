@@ -58,8 +58,8 @@ class Puzzle:
                     # Only check for cell with values
                     if self.matrix.values[i][j] is None:
                         continue
-                    print('Checking for cell at (',
-                          str(i), ', ' + str(j) + ')')
+                    print('Checking for cell at (' +
+                          str(i), ',' + str(j) + ')')
                     self.findPairs(i, j)
                     self.avoidTrios(i, j)
             self.completeRowsAndCols()
