@@ -7,6 +7,6 @@ puzzle = Puzzle()
 puzzle.set(
     Puzzle.DIFFICULTY['very hard'],
     Puzzle.LEVEL[27],
-    Puzzle.SIZE['14*14']
+    Puzzle.SIZE['10*10']
 )
 puzzle.play()
