@@ -5,6 +5,7 @@ from Matrix import Matrix
 
 
 class Puzzle:
+    # Puzzle constants
     SIZE = {
         '6*6': 6,
         '8*8': 8,
@@ -21,6 +22,7 @@ class Puzzle:
     LEVEL = range(101)  # from 1 to 100
 
     def __init__(self):
+        # Get Selenium Chrome Driver
         self.browser = helpers.getChromeDriver()
 
     def set(self, difficulty, level, size=12):
@@ -33,17 +35,20 @@ class Puzzle:
         # Load matrix from game
         self.matrix = Matrix(self.browser, self.size)
 
+    # Construct binary puzzle URL
     def getUrl(self):
         return 'http://binarypuzzle.com/puzzles.php?' \
             + 'size=' + str(self.size) \
             + '&level=' + str(self.difficulty) \
             + '&nr=' + str(self.level)
 
+    # Show puzzle configuration
     def showConfig(self):
         print('Difficulty = ' + str(self.difficulty))
         print('Level = ' + str(self.level))
         print('Size = ' + str(self.size))
 
+    # Let's play!
     def play(self):
         # This is the matrix we start with
         self.matrix.print()
@@ -77,6 +82,7 @@ class Puzzle:
                 + ' out of '
                 + str(self.size*self.size))
 
+        # This is the matrix we end up with
         self.matrix.print()
 
     # Find pairs:
