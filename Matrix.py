@@ -85,8 +85,6 @@ class Matrix:
         if self.values[i][j] is not None:
             return
 
-        print('Setting [' + str(i) + ',' + str(j) + '] from '
-              + str(self.values[i][j]) + ' to ' + str(value))
         self.values[i][j] = value
         self.addCount(i, j, value)
 

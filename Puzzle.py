@@ -154,7 +154,6 @@ class Puzzle:
     # Complete rows and columns:
     # Each row and each column should contain an equal number of 1s and 0s.
     def completeRowsAndCols(self):
-        print('Calling completeRowsAndCols method...')
         for v in self.matrix.vectorTypes:
             for i in range(self.size):
                 # Current vector is only missing 1s
@@ -170,9 +169,13 @@ class Puzzle:
                     continue
 
                 # Set the missing cells to the value we know
+                print(v + str(i) + ' already has all the ' + str(1-val) +
+                      's. Setting all missing cells (listed below) at ' +
+                      v + str(i) + ' to ' + str(val))
                 for j in range(self.size):
                     (row, col) = self.matrix.getRowAndColIndexes(v, i, j)
                     if self.matrix.values[row][col] is None:
+                        print('(' + str(row) + ', ' + ')')
                         self.matrix.setCell(row, col, val)
 
     # Try solving near complete rows/cols
