@@ -159,30 +159,25 @@ class Puzzle:
     # Each row and each column should contain an equal number of 1s and 0s.
     def completeRowsAndCols(self):
         print('Calling completeRowsAndCols method...')
-        # For each row
-        for i in range(self.size):
-            if (self.matrix.count['row'][i][0] == self.size/2 and
-                    self.matrix.count['row'][i][1] < self.size/2):
+        for v in self.matrix.vectorTypes:
+            for i in range(self.size):
+                # Current vector is only missing 1s
+                if (self.matrix.count[v][i][0] == self.size/2 and
+                        self.matrix.count[v][i][1] < self.size/2):
+                    val = 1
+                # Current vector is only missing 0s
+                elif (self.matrix.count[v][i][1] == self.size/2 and
+                        self.matrix.count[v][i][0] < self.size/2):
+                    val = 0
+                # Current vector is missing a mix of 1s and 0s
+                else:
+                    continue
+
+                # Set the missing cells to the value we know
                 for j in range(self.size):
-                    if self.matrix.values[i][j] is None:
-                        self.matrix.setCell(i, j, 1)
-            elif (self.matrix.count['row'][i][1] == self.size/2 and
-                    self.matrix.count['row'][i][0] < self.size/2):
-                for j in range(self.size):
-                    if self.matrix.values[i][j] is None:
-                        self.matrix.setCell(i, j, 0)
-        # For each col
-        for j in range(self.size):
-            if (self.matrix.count['col'][j][0] == self.size/2 and
-                    self.matrix.count['col'][j][1] < self.size/2):
-                for i in range(self.size):
-                    if self.matrix.values[i][j] is None:
-                        self.matrix.setCell(i, j, 1)
-            elif (self.matrix.count['col'][j][1] == self.size/2 and
-                    self.matrix.count['col'][j][0] < self.size/2):
-                for i in range(self.size):
-                    if self.matrix.values[i][j] is None:
-                        self.matrix.setCell(i, j, 0)
+                    (row, col) = self.matrix.getRowAndColIndexes(v, i, j)
+                    if self.matrix.values[row][col] is None:
+                        self.matrix.setCell(row, col, val)
 
     # Try solving near complete rows/cols
     def solveNearComplete(self):
