@@ -63,8 +63,6 @@ class Puzzle:
                     # Only check for cell with values
                     if self.matrix.values[i][j] is None:
                         continue
-                    print('Checking for cell at (' +
-                          str(i), ',' + str(j) + ')')
                     self.findPairs(i, j)
                     self.avoidTrios(i, j)
             self.completeRowsAndCols()
@@ -89,7 +87,6 @@ class Puzzle:
     # Because no more than two similar numbers next to or below each other
     # are allowed, pairs can be supplementen with the other number.
     def findPairs(self, i, j):
-        print('Calling findPairs method...')
         neighbours = [
             {
                 'row': i-1, 'col': j,
@@ -120,13 +117,12 @@ class Puzzle:
                 ]
             }
         ]
-        self.matrix.setNeighbours(neighbours, self.matrix.values[i][j])
+        self.matrix.setNeighbours(neighbours, i, j)
 
     # Avoid trios:
     # If two cells contain the same number with an empty cell in between,
     # this empty cell should contain the other number.
     def avoidTrios(self, i, j):
-        print('Calling avoidTrios method...')
         neighbours = [
             {
                 'row': i-2, 'col': j,
@@ -153,7 +149,7 @@ class Puzzle:
                 ]
             }
         ]
-        self.matrix.setNeighbours(neighbours, self.matrix.values[i][j])
+        self.matrix.setNeighbours(neighbours, i, j)
 
     # Complete rows and columns:
     # Each row and each column should contain an equal number of 1s and 0s.

@@ -122,7 +122,8 @@ class Matrix:
         return True
 
     # Set the adjacent cells of neighbours to the other number
-    def setNeighbours(self, neighbours, current):
+    def setNeighbours(self, neighbours, i, j):
+        current = self.values[i][j]
         for neighbour in neighbours:
             row = neighbour['row']
             col = neighbour['col']
@@ -135,6 +136,12 @@ class Matrix:
                     if (self.indexIsInRange(adjRow, adjCol) and
                             self.values[adjRow][adjCol] is None):
                         # Set the adjcent to the other number
+                        print('Cell at (' + str(adjRow) + ', ' + str(adjCol) +
+                              ') is set to ' + str(1 - current) +
+                              ' because both cells at ' +
+                              '(' + str(i) + ', ' + str(j) + ')' + ' and ' +
+                              '(' + str(row) + ', ' + str(col) + ')' +
+                              'are ' + str(current))
                         self.setCell(adjRow, adjCol, 1 - current)
 
     # Count the not none cells in rows/columns
