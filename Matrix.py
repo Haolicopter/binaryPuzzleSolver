@@ -10,27 +10,20 @@ class Matrix:
         self.browser = browser
         self.size = size
         self.cellCssClass = cellCssClass
-        self.totalCount = 0
-        self.count = {
-            'row': [], 'col': []
-        }
-        for i in range(size):
-            self.count['row'].append(
-                {
-                    'total': 0,
-                    0: 0,
-                    1: 0
-                }
-            )
-            self.count['col'].append(
-                {
-                    'total': 0,
-                    0: 0,
-                    1: 0
-                }
-            )
-
         self.vectorTypes = ('row', 'col')
+        self.totalCount = 0
+        self.count = {}
+        for v in self.vectorTypes:
+            self.count[v] = []
+            for i in range(size):
+                self.count[v].append(
+                    {
+                        'total': 0,
+                        0: 0,
+                        1: 0
+                    }
+                )
+
         self.completeVectors = []
         self.nearCompleteVectors = []
 
@@ -61,16 +54,6 @@ class Matrix:
             for j in range(self.size):
                 row.append(self.values[i][j])
             print(row)
-        #     print('Row total count: ' + str(self.count['row'][i]['total']))
-        #     print('Row zeros count: ' + str(self.count['row'][i][0]))
-        #     print('Row ones count: ' + str(self.count['row'][i][1]))
-        #     print('Col total count: ' + str(self.count['col'][i]['total']))
-        #     print('Col zeros count: ' + str(self.count['col'][i][0]))
-        #     print('Col ones count: ' + str(self.count['col'][i][1]))
-        # print('Complete vectors:')
-        # print(self.completeVectors)
-        # print('Near complete vectors:')
-        # print(self.nearCompleteVectors)
 
     # Draw the matrix on browser
     def draw(self):
