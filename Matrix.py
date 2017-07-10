@@ -54,6 +54,7 @@ class Matrix:
             for j in range(self.size):
                 row.append(self.values[i][j])
             print(row)
+        print()
 
     # Draw the matrix on browser
     def draw(self):
@@ -85,8 +86,6 @@ class Matrix:
         if self.values[i][j] is not None:
             return
 
-        print('Setting [' + str(i) + ',' + str(j) + '] from '
-              + str(self.values[i][j]) + ' to ' + str(value))
         self.values[i][j] = value
         self.addCount(i, j, value)
 
@@ -107,7 +106,7 @@ class Matrix:
                 if (self.count[v][i]['total'] != self.size or
                         self.count[v][i][0] != self.size/2 or
                         self.count[v][i][1] != self.size/2):
-                    print(v + str(i)
+                    print(v + ' ' + str(i)
                             + ' has ' + str(self.count[v][i][0]) + ' zeros'
                             + ' and ' + str(self.count[v][i][1]) + ' ones')
                     return False
@@ -122,7 +121,8 @@ class Matrix:
         return True
 
     # Set the adjacent cells of neighbours to the other number
-    def setNeighbours(self, neighbours, current):
+    def setNeighbours(self, neighbours, i, j):
+        current = self.values[i][j]
         for neighbour in neighbours:
             row = neighbour['row']
             col = neighbour['col']
@@ -135,6 +135,12 @@ class Matrix:
                     if (self.indexIsInRange(adjRow, adjCol) and
                             self.values[adjRow][adjCol] is None):
                         # Set the adjcent to the other number
+                        print('Cell (' + str(adjRow) + ', ' + str(adjCol) +
+                              ') is set to ' + str(1 - current) +
+                              ' because both cells ' +
+                              '(' + str(i) + ', ' + str(j) + ')' + ' and ' +
+                              '(' + str(row) + ', ' + str(col) + ')' +
+                              ' are ' + str(current))
                         self.setCell(adjRow, adjCol, 1 - current)
 
     # Count the not none cells in rows/columns
@@ -158,8 +164,8 @@ class Matrix:
         if vectorMissingCells == 0:
             if self.checkCorrectness(vectorType, i) is False:
                 print(vector)
-                raise Exception(vectorType + str(i) + ' isnt correct, abort!')
-            print(vectorType + str(i) + ' is complete')
+                raise Exception(vectorType + ' ' + str(i) + ' is not correct!')
+            print(vectorType + ' ' + str(i) + ' is complete')
             # Add to complete vector list if does not exist
             if vector not in self.completeVectors:
                 print('adding to the complete vectors')
@@ -262,7 +268,6 @@ class Matrix:
 
     # Check if it has consecutive three or more zeros/ones
     def hasThreeOrMoreConsecutiveSameNumber(self, vector):
-        print('Checking violation for ', vector)
         previous = None
         streak = 0
         for x in range(len(vector)):
@@ -270,13 +275,11 @@ class Matrix:
             if current == previous and current is not None:
                 streak += 1
                 if streak >= 2:
-                    print('violated!')
                     return True
             else:
                 streak = 0
             previous = current
 
-        print('nope, no violation')
         return False
 
     # Check if matrix has duplicated rows/cols
