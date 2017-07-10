@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import helpers
+import os
 from Matrix import Matrix
 
 
@@ -72,10 +73,10 @@ class Puzzle:
             if self.matrix.isCorrect():
                 print('Yay! We did it!')
             else:
-                print('Sorry but the solution is not correct')
+                print('Crap the solution is incorrect!')
         else:
             print(
-                'Still need more work.. We solved '
+                'Need more work.. We solved '
                 + str(self.matrix.totalCount)
                 + ' out of '
                 + str(self.size*self.size))
@@ -169,13 +170,14 @@ class Puzzle:
                     continue
 
                 # Set the missing cells to the value we know
-                print(v + str(i) + ' already has all the ' + str(1-val) +
+                print(v + ' ' + str(i) + ' already has all the ' + str(1-val) +
                       's. Setting all missing cells (listed below) at ' +
-                      v + str(i) + ' to ' + str(val))
+                      v + ' ' + str(i) + ' to ' + str(val))
                 for j in range(self.size):
                     (row, col) = self.matrix.getRowAndColIndexes(v, i, j)
                     if self.matrix.values[row][col] is None:
-                        print('(' + str(row) + ', ' + ')')
+                        print('Setting cell (' + str(row) + ', ' + str(col) +
+                              ') to ' + str(val))
                         self.matrix.setCell(row, col, val)
 
     # Try solving near complete rows/cols
@@ -188,9 +190,6 @@ class Puzzle:
     # Eliminate impossible combinations based on completed rows/columns:
     # No identical rows/columns are allowed.
     def eliminateImpossibleCombinations(self, vectorType, i, missingCount):
-        print('Calling eliminateImpossibleCombinations method at '
-              + vectorType + str(i) + ' with '
-              + str(missingCount) + ' missing cells')
         # Lay out all the possible combinations
         candidates = self.matrix.getCandidates(vectorType, i, missingCount)
 
@@ -205,24 +204,53 @@ class Puzzle:
                 wrongCandidates.append(candidate)
                 continue
 
+        if len(candidates) == len(wrongCandidates):
+            return
+
         for wrongCandidate in wrongCandidates:
             candidates.remove(wrongCandidate)
 
-        # If we have one possible combination, this is the answer
-        if len(candidates) == 1:
+        candidatesCount = len(candidates)
+        hasMessage = False
+        message = 'Using eliminateImpossibleCombinations method at ' + \
+            vectorType + ' ' + str(i) + ' with ' + str(missingCount) + \
+            ' missing cells, we nailed down to ' + str(candidatesCount) + \
+            ' possible combo(s)' + os.linesep
+
+        for candidate in candidates:
+            line = ''
+            for x in range(len(candidate)):
+                line += str(candidate[x]['val']) + ', '
+            message += line[:-2] + os.linesep
+
+        if candidatesCount == 1:
+            message += 'Since this is the only possible combination. ' + \
+                'We solved entire ' + vectorType + ' ' + str(i) + os.linesep
             for cell in candidates[0]:
                 if cell['isGuess']:
+                    hasMessage = True
+                    message += 'Setting cell (' + str(cell['row']) + ', ' + \
+                        str(cell['col']) + ') to ' + str(cell['val']) + \
+                        os.linesep
                     self.matrix.setCell(cell['row'], cell['col'], cell['val'])
-        # If we have multiple possible combinations, find the common cells
-        elif len(candidates) > 1:
+        elif candidatesCount > 1:
+            message += 'Finding missing cells that all combos agree on' + \
+                os.linesep
             for x in range(len(candidates[0])):
                 cell = candidates[0][x]
                 if cell['isGuess'] is False:
                     continue
                 isCommon = True
-                for i in range(1, len(candidates)):
+                for i in range(1, candidatesCount):
                     if cell['val'] != candidates[i][x]['val']:
                         isCommon = False
                         break
                 if isCommon:
+                    hasMessage = True
+                    message += 'Setting cell (' + str(cell['row']) + ', ' + \
+                        str(cell['col']) + ') to ' + str(cell['val']) + \
+                        os.linesep
                     self.matrix.setCell(cell['row'], cell['col'], cell['val'])
+
+        if hasMessage:
+            print(message.rstrip())
